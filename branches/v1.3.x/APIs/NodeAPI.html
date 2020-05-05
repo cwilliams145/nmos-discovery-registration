@@ -235,13 +235,13 @@ pre code {
             "senders/",
             "receivers/"
         ],
-        "maxItems": 6,
-        "minItems": 6,
-        "type": "string",
-        "uniqueItems": true
+        "type": "string"
     },
+    "maxItems": 6,
+    "minItems": 6,
     "title": "Node API base resource",
-    "type": "array"
+    "type": "array",
+    "uniqueItems": true
 }
 </code></pre><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
     "self/", 
@@ -1135,7 +1135,6 @@ pre code {
         "title": "Source resource",
         "type": "object"
     },
-    "minItems": 0,
     "title": "Collection of Sources",
     "type": "array",
     "uniqueItems": true
@@ -3229,7 +3228,6 @@ pre code {
         "title": "Flow resource",
         "type": "object"
     },
-    "minItems": 0,
     "title": "Collection of Flows",
     "type": "array",
     "uniqueItems": true
@@ -4943,7 +4941,6 @@ pre code {
         "title": "Device resource",
         "type": "object"
     },
-    "minItems": 0,
     "title": "Collection of Devices",
     "type": "array",
     "uniqueItems": true
@@ -5364,7 +5361,6 @@ pre code {
         "title": "Sender resource",
         "type": "object"
     },
-    "minItems": 0,
     "title": "Collection of Senders",
     "type": "array",
     "uniqueItems": true
@@ -6291,7 +6287,6 @@ pre code {
         "title": "Receiver resource",
         "type": "object"
     },
-    "minItems": 0,
     "title": "Collection of Receivers",
     "type": "array",
     "uniqueItems": true
