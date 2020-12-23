@@ -4,7 +4,7 @@
 
 | Repository | Default Branch | Lint (default) | Render (all) |
 | --- | --- | --- | --- |
-| [nmos-discovery-registration](https://github.com/AMWA-TV/nmos-discovery-registration) | v1.3.x | <a href="https://travis-ci.com/AMWA-TV/nmos-discovery-registration?branch=v1.3.x"><img src="https://travis-ci.com/AMWA-TV/nmos-discovery-registration.svg?branch=v1.3.x" width="100"/></a> | <a href="https://travis-ci.com/AMWA-TV/nmos-discovery-registration?branch=gh-pages"><img src="https://travis-ci.com/AMWA-TV/nmos-discovery-registration.svg?branch=gh-pages" width="100"/></a> |
+| [nmos-discovery-registration](https://github.com/AMWA-TV/nmos-discovery-registration) | v1.3.x | [![Lint Status](https://github.com/AMWA-TV/nmos-discovery-registration/workflows/Lint/badge.svg)](https://github.com/AMWA-TV/nmos-discovery-registration/actions?query=workflow%3ALint) | [![Render Status](https://github.com/AMWA-TV/nmos-discovery-registration/workflows/Render/badge.svg)](https://github.com/AMWA-TV/nmos-discovery-registration/actions?query=workflow%3ARender) |
 
 
 ---
