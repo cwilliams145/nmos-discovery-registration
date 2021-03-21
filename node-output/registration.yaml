@@ -1,0 +1,2490 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "Registration",
+    "description" : "The Registration API is exposed by NMOS discovery Nodes. It is used to publish data to the distributed registry, which can then be queried via the Query API. In smaller deployments where no distributed registry is available, the Registration API is not used and discovery responsibilities fall to individual Nodes which choose to implement Peer to Peer specification. The Registration API is a Write Only API.\nFurther normative documentation covering the behaviour of this API is contained in the [docs](../docs) folder of this repository.",
+    "contact" : { },
+    "version" : "v1.3"
+  },
+  "servers" : [ {
+    "url" : "http://example.api.com/x-nmos/registration/{version}",
+    "variables" : {
+      "version" : {
+        "description" : "Api version string",
+        "default" : "v1.3"
+      }
+    }
+  }, {
+    "url" : "http://192.168.86.30:8080/x-nmos/registration/{version}",
+    "variables" : {
+      "version" : {
+        "description" : "Api version string",
+        "default" : "v1.3"
+      }
+    }
+  } ],
+  "paths" : {
+    "/resource/{resourceType}/{resourceId}" : {
+      "get" : {
+        "tags" : [ "resource" ],
+        "summary" : "ResourceByResourceTypeAndResourceId_GET",
+        "description" : "Show a registered resource (for debug use only)",
+        "operationId" : "ResourceByResourceTypeAndResourceId_GET",
+        "parameters" : [ {
+          "name" : "resourceId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "pattern" : "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type" : "string"
+          }
+        }, {
+          "name" : "resourceType",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/resourceType"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Returned when the requested resource does not exist",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Returned when the resource exists in the registry at a different API version. The correct API version is identified via the Location header.",
+            "headers" : {
+              "Location" : {
+                "style" : "simple",
+                "explode" : false,
+                "content" : {
+                  "text/plain" : {
+                    "schema" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated" : false
+      },
+      "delete" : {
+        "tags" : [ "resource" ],
+        "summary" : "ResourceByResourceTypeAndResourceId_DELETE",
+        "description" : "Delete a registered resource",
+        "operationId" : "ResourceByResourceTypeAndResourceId_DELETE",
+        "parameters" : [ {
+          "name" : "resourceId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "pattern" : "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type" : "string"
+          }
+        }, {
+          "name" : "resourceType",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/resourceType"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "The expected response, indicating 'No Content' following the DELETE",
+            "content" : { }
+          },
+          "404" : {
+            "description" : "Returned when the requested resource does not exist",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Returned when the resource exists in the registry at a different API version. The correct API version is identified via the Location header.",
+            "headers" : {
+              "Location" : {
+                "style" : "simple",
+                "explode" : false,
+                "content" : {
+                  "text/plain" : {
+                    "schema" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated" : false
+      }
+    },
+    "/" : {
+      "get" : {
+        "summary" : "Untitled Endpoint_GET",
+        "description" : "List of paths available from this API",
+        "operationId" : "UntitledEndpoint_GET",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "maxItems" : 2,
+                  "minItems" : 2,
+                  "uniqueItems" : true,
+                  "type" : "array",
+                  "example" : [ "resource/", "health/" ],
+                  "items" : {
+                    "$ref" : "#/components/schemas/RegistrationAPIbaseresource"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated" : false
+      }
+    },
+    "/health/nodes/{nodeId}" : {
+      "get" : {
+        "tags" : [ "health" ],
+        "summary" : "HealthNodesByNodeId_GET",
+        "description" : "Show a Node's health (for debug use only)",
+        "operationId" : "HealthNodesByNodeId_GET",
+        "parameters" : [ {
+          "name" : "nodeId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "pattern" : "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Heartbeatresponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Returned when the requested Node does not exist or has been garbage collected",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Returned when the requested Node exists in the registry but at a different API version. The correct API version is identified via the Location header.",
+            "headers" : {
+              "Location" : {
+                "style" : "simple",
+                "explode" : false,
+                "content" : {
+                  "text/plain" : {
+                    "schema" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated" : false
+      },
+      "post" : {
+        "tags" : [ "health" ],
+        "summary" : "HealthNodesByNodeId_POST",
+        "description" : "Update Node health",
+        "operationId" : "HealthNodesByNodeId_POST",
+        "parameters" : [ {
+          "name" : "nodeId",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "pattern" : "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Heartbeatresponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Returned when the requested Node does not exist or has been garbage collected",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Returned when the requested Node exists in the registry but at a different API version. The correct API version is identified via the Location header.",
+            "headers" : {
+              "Location" : {
+                "style" : "simple",
+                "explode" : false,
+                "content" : {
+                  "text/plain" : {
+                    "schema" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated" : false
+      }
+    },
+    "/resource" : {
+      "post" : {
+        "tags" : [ "resource" ],
+        "summary" : "Resource_POST",
+        "description" : "Create or update a registered resource",
+        "operationId" : "Resource_POST",
+        "parameters" : [ ],
+        "requestBody" : {
+          "content" : {
+            "text/plain" : {
+              "schema" : {
+                "type" : "object",
+                "example" : {
+                  "type" : "node",
+                  "data" : {
+                    "version" : "1441973902:879053935",
+                    "hostname" : "host1",
+                    "label" : "host1",
+                    "description" : "host1",
+                    "tags" : { },
+                    "href" : "http://172.29.80.65:12345/",
+                    "api" : {
+                      "versions" : [ "v1.0", "v1.1" ],
+                      "endpoints" : [ {
+                        "host" : "172.29.80.65",
+                        "port" : 12345,
+                        "protocol" : "http"
+                      }, {
+                        "host" : "172.29.80.65",
+                        "port" : 443,
+                        "protocol" : "https"
+                      } ]
+                    },
+                    "services" : [ {
+                      "href" : "http://172.29.80.65:12345/x-manufacturer/pipelinemanager/",
+                      "type" : "urn:x-manufacturer:service:pipelinemanager"
+                    }, {
+                      "href" : "http://172.29.80.65:12345/x-manufacturer/status/",
+                      "type" : "urn:x-manufacturer:service:status"
+                    }, {
+                      "href" : "http://172.29.80.65:12345/x-manufacturer/tally/",
+                      "type" : "urn:x-manufacturer:service:tally"
+                    }, {
+                      "href" : "http://172.29.80.65:12345/x-manufacturer/mdnsbridge/",
+                      "type" : "urn:x-manufacturer:service:mdnsbridge"
+                    }, {
+                      "href" : "http://172.29.80.65:12345/x-manufacturer/storequery/",
+                      "type" : "urn:x-manufacturer:service:storequery"
+                    } ],
+                    "caps" : { },
+                    "id" : "3b8be755-08ff-452b-b217-c9151eb21193",
+                    "clocks" : [ {
+                      "name" : "clk0",
+                      "ref_type" : "internal"
+                    }, {
+                      "name" : "clk1",
+                      "ref_type" : "ptp",
+                      "traceable" : true,
+                      "version" : "IEEE1588-2008",
+                      "gmid" : "08-00-11-ff-fe-21-e1-b0",
+                      "locked" : true
+                    } ]
+                  }
+                }
+              },
+              "example" : {
+                "type" : "node",
+                "data" : {
+                  "version" : "1441973902:879053935",
+                  "hostname" : "host1",
+                  "label" : "host1",
+                  "description" : "host1",
+                  "tags" : { },
+                  "href" : "http://172.29.80.65:12345/",
+                  "api" : {
+                    "versions" : [ "v1.0", "v1.1" ],
+                    "endpoints" : [ {
+                      "host" : "172.29.80.65",
+                      "port" : 12345,
+                      "protocol" : "http"
+                    }, {
+                      "host" : "172.29.80.65",
+                      "port" : 443,
+                      "protocol" : "https"
+                    } ]
+                  },
+                  "services" : [ {
+                    "href" : "http://172.29.80.65:12345/x-manufacturer/pipelinemanager/",
+                    "type" : "urn:x-manufacturer:service:pipelinemanager"
+                  }, {
+                    "href" : "http://172.29.80.65:12345/x-manufacturer/status/",
+                    "type" : "urn:x-manufacturer:service:status"
+                  }, {
+                    "href" : "http://172.29.80.65:12345/x-manufacturer/tally/",
+                    "type" : "urn:x-manufacturer:service:tally"
+                  }, {
+                    "href" : "http://172.29.80.65:12345/x-manufacturer/mdnsbridge/",
+                    "type" : "urn:x-manufacturer:service:mdnsbridge"
+                  }, {
+                    "href" : "http://172.29.80.65:12345/x-manufacturer/storequery/",
+                    "type" : "urn:x-manufacturer:service:storequery"
+                  } ],
+                  "caps" : { },
+                  "id" : "3b8be755-08ff-452b-b217-c9151eb21193",
+                  "clocks" : [ {
+                    "name" : "clk0",
+                    "ref_type" : "internal"
+                  }, {
+                    "name" : "clk1",
+                    "ref_type" : "ptp",
+                    "traceable" : true,
+                    "version" : "IEEE1588-2008",
+                    "gmid" : "08-00-11-ff-fe-21-e1-b0",
+                    "locked" : true
+                  } ]
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "The expected response for an update operation on an existing registered resource",
+            "headers" : {
+              "Location" : {
+                "style" : "simple",
+                "explode" : false,
+                "content" : {
+                  "text/plain" : {
+                    "schema" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "201" : {
+            "description" : "The expected response for a create operation performed for a previously unregistered resource",
+            "headers" : {
+              "Location" : {
+                "style" : "simple",
+                "explode" : false,
+                "content" : {
+                  "text/plain" : {
+                    "schema" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Returned when the POST request is incorrectly formatted, missing mandatory attributes or breaches another condition which a Node is unlikely to be able to automatically correct.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Returned when the resource already exists in the registry at a different API version. The correct API version is identified via the Location header.",
+            "headers" : {
+              "Location" : {
+                "style" : "simple",
+                "explode" : false,
+                "content" : {
+                  "text/plain" : {
+                    "schema" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Errorresponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated" : false
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "DataSourceresource" : {
+        "title" : "DataSourceresource",
+        "required" : [ "caps", "clock_name", "description", "device_id", "format", "id", "label", "parents", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate"
+          },
+          "caps" : {
+            "type" : "object",
+            "description" : "Capabilities (not yet defined)"
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Source. This attribute is used to ensure referential integrity by registry implementations."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Source IDs of Grains which came together at the input to this Source (may change over the lifetime of this Source)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "clock_name" : {
+            "type" : "string",
+            "description" : "Reference to clock in the originating Node",
+            "nullable" : true
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Source as a URN",
+            "example" : "urn:x-nmos:format:data"
+          },
+          "event_type" : {
+            "type" : "string",
+            "description" : "Event type generated by this Source, if applicable"
+          }
+        },
+        "description" : "Describes a data Source"
+      },
+      "Errorresponse" : {
+        "title" : "Errorresponse",
+        "required" : [ "code", "debug", "error" ],
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "maximum" : 599,
+            "minimum" : 400,
+            "type" : "integer",
+            "description" : "HTTP error code",
+            "format" : "int32"
+          },
+          "error" : {
+            "type" : "string",
+            "description" : "Human readable message which is suitable for user interface display, and helpful to the user"
+          },
+          "debug" : {
+            "type" : "string",
+            "description" : "Debug information which may assist a programmer working with the API",
+            "nullable" : true
+          }
+        },
+        "description" : "Describes the standard error response which is returned with HTTP codes 400 and above"
+      },
+      "Api" : {
+        "title" : "Api",
+        "required" : [ "endpoints", "versions" ],
+        "type" : "object",
+        "properties" : {
+          "versions" : {
+            "type" : "array",
+            "description" : "Supported API versions running on this Node",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "endpoints" : {
+            "type" : "array",
+            "description" : "Host, port and protocol details required to connect to the API",
+            "items" : {
+              "$ref" : "#/components/schemas/Endpoint"
+            }
+          }
+        },
+        "description" : "URL fragments required to connect to the Node API"
+      },
+      "Format" : {
+        "title" : "Format",
+        "type" : "string",
+        "description" : "Format of the data coming from the Source as a URN",
+        "enum" : [ "urn:x-nmos:format:video", "urn:x-nmos:format:mux" ]
+      },
+      "Heartbeatresponse" : {
+        "title" : "Heartbeatresponse",
+        "required" : [ "health" ],
+        "type" : "object",
+        "properties" : {
+          "health" : {
+            "pattern" : "^[0-9]+$",
+            "type" : "string",
+            "description" : "Timestamp indicating the time in seconds at which the server recorded the heartbeat"
+          }
+        },
+        "description" : "Response to a request to update a resource's health"
+      },
+      "MediaType8" : {
+        "title" : "MediaType8",
+        "type" : "string",
+        "description" : "Subclassification of the format using IANA assigned media types",
+        "enum" : [ "video/raw" ]
+      },
+      "PTPclock" : {
+        "title" : "PTPclock",
+        "required" : [ "gmid", "locked", "name", "ref_type", "traceable", "version" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "Name of this refclock (unique for this set of clocks)"
+          },
+          "ref_type" : {
+            "type" : "string",
+            "description" : "Type of external reference used by this clock",
+            "example" : "ptp"
+          },
+          "traceable" : {
+            "type" : "boolean",
+            "description" : "External refclock is synchronised to International Atomic Time (TAI)"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "Version of PTP reference used by this clock",
+            "example" : "IEEE1588-2008"
+          },
+          "gmid" : {
+            "type" : "string",
+            "description" : "ID of the PTP reference used by this clock"
+          },
+          "locked" : {
+            "type" : "boolean",
+            "description" : "Lock state of this clock to the external reference. If true, this device is slaved, otherwise it has no defined relationship to the external reference"
+          }
+        },
+        "description" : "Describes a clock referenced to PTP"
+      },
+      "Resourceregistration5" : {
+        "title" : "Resourceregistration5",
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/Type5"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/Flowresource"
+          }
+        }
+      },
+      "AudioReceiverresource" : {
+        "title" : "AudioReceiverresource",
+        "required" : [ "caps", "description", "device_id", "format", "id", "interface_bindings", "label", "subscription", "tags", "transport", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Device ID which this Receiver forms part of. This attribute is used to ensure referential integrity by registry implementations."
+          },
+          "transport" : {
+            "type" : "object",
+            "description" : "Transport type accepted by the Receiver in URN format"
+          },
+          "interface_bindings" : {
+            "type" : "array",
+            "description" : "Binding of Receiver ingress ports to interfaces on the parent Node.",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "subscription" : {
+            "$ref" : "#/components/schemas/Subscription1"
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Type of Flow accepted by the Receiver as a URN",
+            "example" : "urn:x-nmos:format:audio"
+          },
+          "caps" : {
+            "$ref" : "#/components/schemas/Caps1"
+          }
+        },
+        "description" : "Describes an audio Receiver"
+      },
+      "Caps3" : {
+        "title" : "Caps3",
+        "type" : "object",
+        "properties" : {
+          "media_types" : {
+            "minItems" : 1,
+            "type" : "array",
+            "description" : "Subclassification of the formats accepted using IANA assigned media types",
+            "items" : {
+              "type" : "object"
+            }
+          }
+        },
+        "description" : "Capabilities"
+      },
+      "Flowresource" : {
+        "title" : "Flowresource",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate3"
+          },
+          "source_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Source which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.0 only)."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.1 onwards)."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Flow IDs of Grains which came together to generate this Flow (may change over the lifetime of this Flow)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "format" : {
+            "$ref" : "#/components/schemas/Format1"
+          },
+          "frame_width" : {
+            "type" : "integer",
+            "description" : "Width of the picture in pixels",
+            "format" : "int32"
+          },
+          "frame_height" : {
+            "type" : "integer",
+            "description" : "Height of the picture in pixels",
+            "format" : "int32"
+          },
+          "interlace_mode" : {
+            "$ref" : "#/components/schemas/InterlaceMode"
+          },
+          "colorspace" : {
+            "type" : "object",
+            "description" : "Colorspace used for the video. Any values not defined in the enum should be defined in the NMOS Parameter Registers"
+          },
+          "transfer_characteristic" : {
+            "type" : "object",
+            "description" : "Transfer characteristic. Any values not defined in the enum should be defined in the NMOS Parameter Registers"
+          },
+          "media_type" : {
+            "$ref" : "#/components/schemas/MediaType8"
+          },
+          "components" : {
+            "minItems" : 1,
+            "type" : "array",
+            "description" : "Array of objects describing the components",
+            "items" : {
+              "$ref" : "#/components/schemas/component1"
+            }
+          },
+          "sample_rate" : {
+            "$ref" : "#/components/schemas/SampleRate"
+          },
+          "bit_depth" : {
+            "type" : "integer",
+            "description" : "Bit depth of the audio samples",
+            "format" : "int32"
+          },
+          "DID_SDID" : {
+            "type" : "array",
+            "description" : "List of Data identification and Secondary data identification words",
+            "items" : {
+              "$ref" : "#/components/schemas/entry"
+            }
+          },
+          "event_type" : {
+            "type" : "string",
+            "description" : "Event type generated by this Flow, if applicable"
+          }
+        },
+        "description" : "Describes a Flow"
+      },
+      "Interface" : {
+        "title" : "Interface",
+        "required" : [ "chassis_id", "name", "port_id" ],
+        "type" : "object",
+        "properties" : {
+          "chassis_id" : {
+            "type" : "object",
+            "description" : "Chassis ID of the interface, as signalled in LLDP from this node. Set to null where LLDP is unsuitable for use (ie. virtualised environments)"
+          },
+          "port_id" : {
+            "type" : "string",
+            "description" : "Port ID of the interface, as signalled in LLDP or via ARP responses from this node. Must be a MAC address"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Name of the interface (unique in scope of this node).  This attribute is used by sub-resources of this node such as senders and receivers to refer to interfaces to which they are bound."
+          },
+          "attached_network_device" : {
+            "$ref" : "#/components/schemas/AttachedNetworkDevice"
+          }
+        }
+      },
+      "Resourceregistration3" : {
+        "title" : "Resourceregistration3",
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/Type3"
+          },
+          "data" : {
+            "type" : "object",
+            "description" : "Describes a Receiver"
+          }
+        }
+      },
+      "component1" : {
+        "title" : "component1",
+        "required" : [ "bit_depth", "height", "name", "width" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "$ref" : "#/components/schemas/Name"
+          },
+          "width" : {
+            "type" : "integer",
+            "description" : "Width of this component in pixels",
+            "format" : "int32"
+          },
+          "height" : {
+            "type" : "integer",
+            "description" : "Height of this component in pixels",
+            "format" : "int32"
+          },
+          "bit_depth" : {
+            "type" : "integer",
+            "description" : "Number of bits used to describe each sample",
+            "format" : "int32"
+          }
+        }
+      },
+      "Caps" : {
+        "title" : "Caps",
+        "type" : "object",
+        "properties" : {
+          "media_types" : {
+            "minItems" : 1,
+            "type" : "array",
+            "description" : "Subclassification of the formats accepted using IANA assigned media types",
+            "items" : {
+              "type" : "object"
+            }
+          }
+        },
+        "description" : "Capabilities"
+      },
+      "DataReceiverresource" : {
+        "title" : "DataReceiverresource",
+        "required" : [ "caps", "description", "device_id", "format", "id", "interface_bindings", "label", "subscription", "tags", "transport", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Device ID which this Receiver forms part of. This attribute is used to ensure referential integrity by registry implementations."
+          },
+          "transport" : {
+            "type" : "object",
+            "description" : "Transport type accepted by the Receiver in URN format"
+          },
+          "interface_bindings" : {
+            "type" : "array",
+            "description" : "Binding of Receiver ingress ports to interfaces on the parent Node.",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "subscription" : {
+            "$ref" : "#/components/schemas/Subscription1"
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Type of Flow accepted by the Receiver as a URN",
+            "example" : "urn:x-nmos:format:data"
+          },
+          "caps" : {
+            "$ref" : "#/components/schemas/Caps2"
+          }
+        },
+        "description" : "Describes a data Receiver"
+      },
+      "Deviceresource" : {
+        "title" : "Deviceresource",
+        "required" : [ "controls", "description", "id", "label", "node_id", "receivers", "senders", "tags", "type", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "type" : {
+            "type" : "object",
+            "description" : "Device type URN"
+          },
+          "node_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Node which initially created the Device. This attribute is used to ensure referential integrity by registry implementations."
+          },
+          "senders" : {
+            "type" : "array",
+            "description" : "UUIDs of Senders attached to the Device (deprecated)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "receivers" : {
+            "type" : "array",
+            "description" : "UUIDs of Receivers attached to the Device (deprecated)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "controls" : {
+            "type" : "array",
+            "description" : "Control endpoints exposed for the Device",
+            "items" : {
+              "$ref" : "#/components/schemas/Control"
+            }
+          }
+        },
+        "description" : "Describes a Device"
+      },
+      "GenericdataFlowresource" : {
+        "title" : "GenericdataFlowresource",
+        "required" : [ "description", "device_id", "format", "id", "label", "media_type", "parents", "source_id", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate3"
+          },
+          "source_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Source which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.0 only)."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.1 onwards)."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Flow IDs of Grains which came together to generate this Flow (may change over the lifetime of this Flow)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Flow as a URN",
+            "example" : "urn:x-nmos:format:data"
+          },
+          "media_type" : {
+            "type" : "string",
+            "description" : "Subclassification of the format using IANA assigned media types"
+          }
+        },
+        "description" : "Describes a generic data Flow"
+      },
+      "Resourceregistration4" : {
+        "title" : "Resourceregistration4",
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/Type4"
+          },
+          "data" : {
+            "type" : "object",
+            "description" : "Describes a Source"
+          }
+        }
+      },
+      "CodedAudioFlowresource" : {
+        "title" : "CodedAudioFlowresource",
+        "required" : [ "description", "device_id", "format", "id", "label", "media_type", "parents", "sample_rate", "source_id", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate3"
+          },
+          "source_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Source which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.0 only)."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.1 onwards)."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Flow IDs of Grains which came together to generate this Flow (may change over the lifetime of this Flow)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Flow as a URN",
+            "example" : "urn:x-nmos:format:audio"
+          },
+          "sample_rate" : {
+            "$ref" : "#/components/schemas/SampleRate"
+          },
+          "media_type" : {
+            "type" : "string",
+            "description" : "Subclassification of the format using IANA assigned media types"
+          }
+        },
+        "description" : "Describes a coded audio Flow"
+      },
+      "CodedVideoFlowresource" : {
+        "title" : "CodedVideoFlowresource",
+        "required" : [ "colorspace", "description", "device_id", "format", "frame_height", "frame_width", "id", "label", "media_type", "parents", "source_id", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate3"
+          },
+          "source_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Source which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.0 only)."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.1 onwards)."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Flow IDs of Grains which came together to generate this Flow (may change over the lifetime of this Flow)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Flow as a URN",
+            "example" : "urn:x-nmos:format:video"
+          },
+          "frame_width" : {
+            "type" : "integer",
+            "description" : "Width of the picture in pixels",
+            "format" : "int32"
+          },
+          "frame_height" : {
+            "type" : "integer",
+            "description" : "Height of the picture in pixels",
+            "format" : "int32"
+          },
+          "interlace_mode" : {
+            "$ref" : "#/components/schemas/InterlaceMode"
+          },
+          "colorspace" : {
+            "type" : "object",
+            "description" : "Colorspace used for the video. Any values not defined in the enum should be defined in the NMOS Parameter Registers"
+          },
+          "transfer_characteristic" : {
+            "type" : "object",
+            "description" : "Transfer characteristic. Any values not defined in the enum should be defined in the NMOS Parameter Registers"
+          },
+          "media_type" : {
+            "type" : "object",
+            "description" : "Subclassification of the format using IANA assigned media types"
+          }
+        },
+        "description" : "Describes a coded Video Flow"
+      },
+      "Format1" : {
+        "title" : "Format1",
+        "type" : "string",
+        "description" : "Format of the data coming from the Flow as a URN",
+        "enum" : [ "urn:x-nmos:format:video" ]
+      },
+      "GrainRate" : {
+        "title" : "GrainRate",
+        "required" : [ "numerator" ],
+        "type" : "object",
+        "properties" : {
+          "numerator" : {
+            "type" : "integer",
+            "description" : "Numerator",
+            "format" : "int32"
+          },
+          "denominator" : {
+            "type" : "integer",
+            "description" : "Denominator",
+            "format" : "int32",
+            "default" : 1
+          }
+        },
+        "description" : "Maximum number of Grains per second for Flows derived from this Source. Corresponding Flow Grain rates may override this attribute. Grain rate matches the frame rate for video (see NMOS Content Model). Specified for periodic Sources only."
+      },
+      "InterlaceMode" : {
+        "title" : "InterlaceMode",
+        "type" : "string",
+        "description" : "Interlaced video mode for frames in this Flow",
+        "enum" : [ "progressive", "interlaced_tff", "interlaced_bff", "interlaced_psf" ]
+      },
+      "JSONbasedFlowresource" : {
+        "title" : "JSONbasedFlowresource",
+        "required" : [ "description", "device_id", "format", "id", "label", "media_type", "parents", "source_id", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate3"
+          },
+          "source_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Source which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.0 only)."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.1 onwards)."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Flow IDs of Grains which came together to generate this Flow (may change over the lifetime of this Flow)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Flow as a URN",
+            "example" : "urn:x-nmos:format:data"
+          },
+          "media_type" : {
+            "type" : "string",
+            "description" : "Subclassification of the format using IANA assigned media types",
+            "example" : "application/json"
+          },
+          "event_type" : {
+            "type" : "string",
+            "description" : "Event type generated by this Flow, if applicable"
+          }
+        },
+        "description" : "Describes a JSON based Flow"
+      },
+      "Resourceregistration1" : {
+        "title" : "Resourceregistration1",
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/Type1"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/Deviceresource"
+          }
+        }
+      },
+      "SDIancillaryFlowresource" : {
+        "title" : "SDIancillaryFlowresource",
+        "required" : [ "description", "device_id", "format", "id", "label", "media_type", "parents", "source_id", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate3"
+          },
+          "source_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Source which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.0 only)."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.1 onwards)."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Flow IDs of Grains which came together to generate this Flow (may change over the lifetime of this Flow)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Flow as a URN",
+            "example" : "urn:x-nmos:format:data"
+          },
+          "media_type" : {
+            "type" : "string",
+            "description" : "Subclassification of the format using IANA assigned media types",
+            "example" : "video/smpte291"
+          },
+          "DID_SDID" : {
+            "type" : "array",
+            "description" : "List of Data identification and Secondary data identification words",
+            "items" : {
+              "$ref" : "#/components/schemas/entry"
+            }
+          }
+        },
+        "description" : "Describes an SDI ancillary Flow"
+      },
+      "AudioSourceresource" : {
+        "title" : "AudioSourceresource",
+        "required" : [ "caps", "channels", "clock_name", "description", "device_id", "format", "id", "label", "parents", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate"
+          },
+          "caps" : {
+            "type" : "object",
+            "description" : "Capabilities (not yet defined)"
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Source. This attribute is used to ensure referential integrity by registry implementations."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Source IDs of Grains which came together at the input to this Source (may change over the lifetime of this Source)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "clock_name" : {
+            "type" : "string",
+            "description" : "Reference to clock in the originating Node",
+            "nullable" : true
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Source as a URN",
+            "example" : "urn:x-nmos:format:audio"
+          },
+          "channels" : {
+            "minItems" : 1,
+            "type" : "array",
+            "description" : "Array of objects describing the audio channels",
+            "items" : {
+              "$ref" : "#/components/schemas/Component"
+            }
+          }
+        },
+        "description" : "Describes an audio Source"
+      },
+      "Clockwithnoexternalreference" : {
+        "title" : "Clockwithnoexternalreference",
+        "required" : [ "name", "ref_type" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "Name of this refclock (unique for this set of clocks)"
+          },
+          "ref_type" : {
+            "type" : "string",
+            "description" : "Type of external reference used by this clock",
+            "example" : "internal"
+          }
+        },
+        "description" : "Describes a clock with no external reference"
+      },
+      "Component" : {
+        "title" : "Component",
+        "required" : [ "label" ],
+        "type" : "object",
+        "properties" : {
+          "label" : {
+            "type" : "string",
+            "description" : "Label for this channel (free text)"
+          },
+          "symbol" : {
+            "type" : "object",
+            "description" : "Symbol for this channel (from VSF TR-03 Appendix A)"
+          }
+        }
+      },
+      "MuxReceiverresource" : {
+        "title" : "MuxReceiverresource",
+        "required" : [ "caps", "description", "device_id", "format", "id", "interface_bindings", "label", "subscription", "tags", "transport", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Device ID which this Receiver forms part of. This attribute is used to ensure referential integrity by registry implementations."
+          },
+          "transport" : {
+            "type" : "object",
+            "description" : "Transport type accepted by the Receiver in URN format"
+          },
+          "interface_bindings" : {
+            "type" : "array",
+            "description" : "Binding of Receiver ingress ports to interfaces on the parent Node.",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "subscription" : {
+            "$ref" : "#/components/schemas/Subscription1"
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Type of Flow accepted by the Receiver as a URN",
+            "example" : "urn:x-nmos:format:mux"
+          },
+          "caps" : {
+            "$ref" : "#/components/schemas/Caps3"
+          }
+        },
+        "description" : "Describes a mux Receiver"
+      },
+      "RegistrationAPIbaseresource" : {
+        "title" : "RegistrationAPIbaseresource",
+        "type" : "string",
+        "enum" : [ "resource/", "health/" ]
+      },
+      "Senderresource" : {
+        "title" : "Senderresource",
+        "required" : [ "description", "device_id", "flow_id", "id", "interface_bindings", "label", "manifest_href", "subscription", "tags", "transport", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "caps" : {
+            "type" : "object",
+            "description" : "Capabilities of this sender"
+          },
+          "flow_id" : {
+            "type" : "string",
+            "description" : "ID of the Flow currently passing via this Sender",
+            "nullable" : true
+          },
+          "transport" : {
+            "type" : "object",
+            "description" : "Transport type used by the Sender in URN format"
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Device ID which this Sender forms part of. This attribute is used to ensure referential integrity by registry implementations."
+          },
+          "manifest_href" : {
+            "type" : "string",
+            "description" : "HTTP(S) accessible URL to a file describing how to connect to the Sender.",
+            "nullable" : true
+          },
+          "interface_bindings" : {
+            "type" : "array",
+            "description" : "Binding of Sender egress ports to interfaces on the parent Node.",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "subscription" : {
+            "$ref" : "#/components/schemas/Subscription"
+          }
+        },
+        "description" : "Describes a sender"
+      },
+      "GenericSourceresource" : {
+        "title" : "GenericSourceresource",
+        "required" : [ "caps", "clock_name", "description", "device_id", "format", "id", "label", "parents", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate"
+          },
+          "caps" : {
+            "type" : "object",
+            "description" : "Capabilities (not yet defined)"
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Source. This attribute is used to ensure referential integrity by registry implementations."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Source IDs of Grains which came together at the input to this Source (may change over the lifetime of this Source)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "clock_name" : {
+            "type" : "string",
+            "description" : "Reference to clock in the originating Node",
+            "nullable" : true
+          },
+          "format" : {
+            "$ref" : "#/components/schemas/Format"
+          }
+        },
+        "description" : "Describes a generic Source"
+      },
+      "MediaType" : {
+        "title" : "MediaType",
+        "type" : "string",
+        "enum" : [ "video/raw", "video/H264", "video/vc2" ]
+      },
+      "Clock" : {
+        "title" : "Clock",
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "Name of this refclock (unique for this set of clocks)"
+          },
+          "ref_type" : {
+            "$ref" : "#/components/schemas/RefType"
+          },
+          "traceable" : {
+            "type" : "boolean",
+            "description" : "External refclock is synchronised to International Atomic Time (TAI)"
+          },
+          "version" : {
+            "$ref" : "#/components/schemas/Version"
+          },
+          "gmid" : {
+            "type" : "string",
+            "description" : "ID of the PTP reference used by this clock"
+          },
+          "locked" : {
+            "type" : "boolean",
+            "description" : "Lock state of this clock to the external reference. If true, this device is slaved, otherwise it has no defined relationship to the external reference"
+          }
+        }
+      },
+      "entry" : {
+        "title" : "entry",
+        "type" : "object",
+        "properties" : {
+          "DID" : {
+            "type" : "string",
+            "description" : "Data identification word"
+          },
+          "SDID" : {
+            "type" : "string",
+            "description" : "Secondary data identification word"
+          }
+        }
+      },
+      "MediaType2" : {
+        "title" : "MediaType2",
+        "type" : "string",
+        "enum" : [ "video/smpte291", "application/json" ]
+      },
+      "Noderesource" : {
+        "title" : "Noderesource",
+        "required" : [ "api", "caps", "clocks", "description", "href", "id", "interfaces", "label", "services", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "href" : {
+            "type" : "string",
+            "description" : "HTTP access href for the Node's API (deprecated)"
+          },
+          "hostname" : {
+            "type" : "string",
+            "description" : "Node hostname (optional, deprecated)"
+          },
+          "api" : {
+            "$ref" : "#/components/schemas/Api"
+          },
+          "caps" : {
+            "type" : "object",
+            "description" : "Capabilities (not yet defined)"
+          },
+          "services" : {
+            "type" : "array",
+            "description" : "Array of objects containing a URN format type and href",
+            "items" : {
+              "$ref" : "#/components/schemas/Service"
+            }
+          },
+          "clocks" : {
+            "type" : "array",
+            "description" : "Clocks made available to Devices owned by this Node",
+            "items" : {
+              "$ref" : "#/components/schemas/Clock"
+            }
+          },
+          "interfaces" : {
+            "type" : "array",
+            "description" : "Network interfaces made available to devices owned by this Node. Port IDs and Chassis IDs are used to inform topology discovery via IS-06, and require that interfaces implement ARP at a minimum, and ideally LLDP.",
+            "items" : {
+              "$ref" : "#/components/schemas/Interface"
+            }
+          }
+        },
+        "description" : "Describes the Node and the services which run on it"
+      },
+      "Colorspace" : {
+        "title" : "Colorspace",
+        "type" : "string",
+        "enum" : [ "BT601", "BT709", "BT2020", "BT2100" ]
+      },
+      "Service" : {
+        "title" : "Service",
+        "required" : [ "href", "type" ],
+        "type" : "object",
+        "properties" : {
+          "href" : {
+            "type" : "string",
+            "description" : "URL to reach a service running on the Node"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "URN identifying the type of service"
+          },
+          "authorization" : {
+            "type" : "boolean",
+            "description" : "This endpoint requires authorization",
+            "default" : false
+          }
+        }
+      },
+      "Control" : {
+        "title" : "Control",
+        "required" : [ "href", "type" ],
+        "type" : "object",
+        "properties" : {
+          "href" : {
+            "type" : "string",
+            "description" : "URL to reach a control endpoint, whether http or otherwise"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "URN identifying the control format"
+          },
+          "authorization" : {
+            "type" : "boolean",
+            "description" : "This endpoint requires authorization",
+            "default" : false
+          }
+        }
+      },
+      "MediaType41" : {
+        "title" : "MediaType41",
+        "type" : "string",
+        "enum" : [ "video/raw" ]
+      },
+      "resourceType" : {
+        "title" : "resourceType",
+        "type" : "string",
+        "enum" : [ "nodes", "devices", "sources", "flows", "senders", "receivers" ]
+      },
+      "Endpoint" : {
+        "title" : "Endpoint",
+        "required" : [ "host", "port", "protocol" ],
+        "type" : "object",
+        "properties" : {
+          "host" : {
+            "type" : "object",
+            "description" : "IP address or hostname which the Node API is running on"
+          },
+          "port" : {
+            "maximum" : 65535,
+            "minimum" : 1,
+            "type" : "integer",
+            "description" : "Port number which the Node API is running on",
+            "format" : "int32"
+          },
+          "protocol" : {
+            "$ref" : "#/components/schemas/Protocol"
+          },
+          "authorization" : {
+            "type" : "boolean",
+            "description" : "This endpoint requires authorization",
+            "default" : false
+          }
+        }
+      },
+      "MediaType1" : {
+        "title" : "MediaType1",
+        "type" : "string",
+        "enum" : [ "audio/L24", "audio/L20", "audio/L16", "audio/L8" ]
+      },
+      "Name" : {
+        "title" : "Name",
+        "type" : "string",
+        "description" : "Name of this component",
+        "enum" : [ "Y", "Cb", "Cr", "I", "Ct", "Cp", "A", "R", "G", "B", "DepthMap" ]
+      },
+      "RawAudioFlowresource" : {
+        "title" : "RawAudioFlowresource",
+        "required" : [ "bit_depth", "description", "device_id", "format", "id", "label", "media_type", "parents", "sample_rate", "source_id", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate3"
+          },
+          "source_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Source which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.0 only)."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.1 onwards)."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Flow IDs of Grains which came together to generate this Flow (may change over the lifetime of this Flow)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Flow as a URN",
+            "example" : "urn:x-nmos:format:audio"
+          },
+          "sample_rate" : {
+            "$ref" : "#/components/schemas/SampleRate"
+          },
+          "media_type" : {
+            "type" : "object",
+            "description" : "Subclassification of the format using IANA assigned media types"
+          },
+          "bit_depth" : {
+            "type" : "integer",
+            "description" : "Bit depth of the audio samples",
+            "format" : "int32"
+          }
+        },
+        "description" : "Describes a raw audio Flow"
+      },
+      "RefType" : {
+        "title" : "RefType",
+        "type" : "string",
+        "description" : "Type of external reference used by this clock",
+        "enum" : [ "internal" ]
+      },
+      "Subscription" : {
+        "title" : "Subscription",
+        "required" : [ "active", "receiver_id" ],
+        "type" : "object",
+        "properties" : {
+          "receiver_id" : {
+            "type" : "string",
+            "description" : "UUID of the Receiver that this Sender is currently subscribed to",
+            "nullable" : true
+          },
+          "active" : {
+            "type" : "boolean",
+            "description" : "Sender is enabled and configured to send data",
+            "example" : false
+          }
+        },
+        "description" : "Object containing the 'receiver_id' currently subscribed to (unicast only)."
+      },
+      "Resourceregistration2" : {
+        "title" : "Resourceregistration2",
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/Type2"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/Senderresource"
+          }
+        }
+      },
+      "SampleRate" : {
+        "title" : "SampleRate",
+        "required" : [ "numerator" ],
+        "type" : "object",
+        "properties" : {
+          "numerator" : {
+            "type" : "integer",
+            "description" : "Numerator",
+            "format" : "int32"
+          },
+          "denominator" : {
+            "type" : "integer",
+            "description" : "Denominator",
+            "format" : "int32",
+            "default" : 1
+          }
+        },
+        "description" : "Number of audio samples per second for this Flow"
+      },
+      "MediaType3" : {
+        "title" : "MediaType3",
+        "type" : "string",
+        "enum" : [ "video/SMPTE2022-6" ]
+      },
+      "AttachedNetworkDevice" : {
+        "title" : "AttachedNetworkDevice",
+        "required" : [ "chassis_id", "port_id" ],
+        "type" : "object",
+        "properties" : {
+          "chassis_id" : {
+            "type" : "object",
+            "description" : "Chassis ID of the attached network device, as signalled in LLDP received by this Node."
+          },
+          "port_id" : {
+            "type" : "object",
+            "description" : "Port ID of the attached network device, as signalled in LLDP received by this Node."
+          }
+        }
+      },
+      "MuxFlowresource" : {
+        "title" : "MuxFlowresource",
+        "required" : [ "description", "device_id", "format", "id", "label", "media_type", "parents", "source_id", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate3"
+          },
+          "source_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Source which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.0 only)."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.1 onwards)."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Flow IDs of Grains which came together to generate this Flow (may change over the lifetime of this Flow)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Flow as a URN",
+            "example" : "urn:x-nmos:format:mux"
+          },
+          "media_type" : {
+            "type" : "object",
+            "description" : "Subclassification of the format using IANA assigned media types"
+          }
+        },
+        "description" : "Describes a mux Flow"
+      },
+      "Caps1" : {
+        "title" : "Caps1",
+        "type" : "object",
+        "properties" : {
+          "media_types" : {
+            "minItems" : 1,
+            "type" : "array",
+            "description" : "Subclassification of the formats accepted using IANA assigned media types",
+            "items" : {
+              "type" : "object"
+            }
+          }
+        },
+        "description" : "Capabilities"
+      },
+      "GrainRate3" : {
+        "title" : "GrainRate3",
+        "required" : [ "numerator" ],
+        "type" : "object",
+        "properties" : {
+          "numerator" : {
+            "type" : "integer",
+            "description" : "Numerator",
+            "format" : "int32"
+          },
+          "denominator" : {
+            "type" : "integer",
+            "description" : "Denominator",
+            "format" : "int32",
+            "default" : 1
+          }
+        },
+        "description" : "Number of Grains per second for this Flow. Must be an integer division of, or equal to the Grain rate specified by the parent Source. Grain rate matches the frame rate for video (see NMOS Content Model). Specified for periodic Flows only."
+      },
+      "Protocol" : {
+        "title" : "Protocol",
+        "type" : "string",
+        "description" : "Protocol supported by this instance of the Node API",
+        "enum" : [ "http", "https" ]
+      },
+      "Caps2" : {
+        "title" : "Caps2",
+        "type" : "object",
+        "properties" : {
+          "media_types" : {
+            "minItems" : 1,
+            "type" : "array",
+            "description" : "Subclassification of the formats accepted using IANA assigned media types",
+            "items" : {
+              "type" : "object"
+            }
+          },
+          "event_types" : {
+            "minItems" : 1,
+            "type" : "array",
+            "description" : "Subclassification of the event types accepted defined by the AMWA IS-07 specification",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        },
+        "description" : "Capabilities"
+      },
+      "MediaType4" : {
+        "title" : "MediaType4",
+        "type" : "string",
+        "enum" : [ "video/H264", "video/vc2" ]
+      },
+      "RawVideoFlowresource" : {
+        "title" : "RawVideoFlowresource",
+        "required" : [ "colorspace", "components", "description", "device_id", "format", "frame_height", "frame_width", "id", "label", "media_type", "parents", "source_id", "tags", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "grain_rate" : {
+            "$ref" : "#/components/schemas/GrainRate3"
+          },
+          "source_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Source which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.0 only)."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the Device which initially created the Flow. This attribute is used to ensure referential integrity by registry implementations (v1.1 onwards)."
+          },
+          "parents" : {
+            "type" : "array",
+            "description" : "Array of UUIDs representing the Flow IDs of Grains which came together to generate this Flow (may change over the lifetime of this Flow)",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Format of the data coming from the Flow as a URN",
+            "example" : "urn:x-nmos:format:video"
+          },
+          "frame_width" : {
+            "type" : "integer",
+            "description" : "Width of the picture in pixels",
+            "format" : "int32"
+          },
+          "frame_height" : {
+            "type" : "integer",
+            "description" : "Height of the picture in pixels",
+            "format" : "int32"
+          },
+          "interlace_mode" : {
+            "$ref" : "#/components/schemas/InterlaceMode"
+          },
+          "colorspace" : {
+            "type" : "object",
+            "description" : "Colorspace used for the video. Any values not defined in the enum should be defined in the NMOS Parameter Registers"
+          },
+          "transfer_characteristic" : {
+            "type" : "object",
+            "description" : "Transfer characteristic. Any values not defined in the enum should be defined in the NMOS Parameter Registers"
+          },
+          "media_type" : {
+            "type" : "string",
+            "description" : "Subclassification of the format using IANA assigned media types",
+            "example" : "video/raw"
+          },
+          "components" : {
+            "minItems" : 1,
+            "type" : "array",
+            "description" : "Array of objects describing the components",
+            "items" : {
+              "$ref" : "#/components/schemas/component1"
+            }
+          }
+        },
+        "description" : "Describes a raw Video Flow"
+      },
+      "Subscription1" : {
+        "title" : "Subscription1",
+        "required" : [ "active", "sender_id" ],
+        "type" : "object",
+        "properties" : {
+          "sender_id" : {
+            "type" : "string",
+            "description" : "UUID of the Sender that this Receiver is currently subscribed to",
+            "nullable" : true
+          },
+          "active" : {
+            "type" : "boolean",
+            "description" : "Receiver is enabled and configured with a Sender's connection parameters",
+            "example" : false
+          }
+        },
+        "description" : "Object containing the 'sender_id' currently subscribed to."
+      },
+      "Resourceregistration" : {
+        "title" : "Resourceregistration",
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/Type"
+          },
+          "data" : {
+            "$ref" : "#/components/schemas/Noderesource"
+          }
+        }
+      },
+      "Type2" : {
+        "title" : "Type2",
+        "type" : "string",
+        "description" : "Singular form of the resource type to be registered",
+        "enum" : [ "sender" ]
+      },
+      "Type3" : {
+        "title" : "Type3",
+        "type" : "string",
+        "description" : "Singular form of the resource type to be registered",
+        "enum" : [ "receiver" ]
+      },
+      "VideoReceiverresource" : {
+        "title" : "VideoReceiverresource",
+        "required" : [ "caps", "description", "device_id", "format", "id", "interface_bindings", "label", "subscription", "tags", "transport", "version" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Globally unique identifier for the resource"
+          },
+          "version" : {
+            "type" : "string",
+            "description" : "String formatted TAI timestamp (<seconds>:<nanoseconds>) indicating precisely when an attribute of the resource last changed"
+          },
+          "label" : {
+            "type" : "string",
+            "description" : "Freeform string label for the resource"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Detailed description of the resource"
+          },
+          "tags" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            },
+            "description" : "Key value set of freeform string tags to aid in filtering resources. Values should be represented as an array of strings. Can be empty."
+          },
+          "device_id" : {
+            "type" : "string",
+            "description" : "Device ID which this Receiver forms part of. This attribute is used to ensure referential integrity by registry implementations."
+          },
+          "transport" : {
+            "type" : "object",
+            "description" : "Transport type accepted by the Receiver in URN format"
+          },
+          "interface_bindings" : {
+            "type" : "array",
+            "description" : "Binding of Receiver ingress ports to interfaces on the parent Node.",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "subscription" : {
+            "$ref" : "#/components/schemas/Subscription1"
+          },
+          "format" : {
+            "type" : "string",
+            "description" : "Type of Flow accepted by the Receiver as a URN",
+            "example" : "urn:x-nmos:format:video"
+          },
+          "caps" : {
+            "$ref" : "#/components/schemas/Caps"
+          }
+        },
+        "description" : "Describes a video Receiver"
+      },
+      "Version" : {
+        "title" : "Version",
+        "type" : "string",
+        "description" : "Version of PTP reference used by this clock",
+        "enum" : [ "IEEE1588-2008" ]
+      },
+      "Symbol" : {
+        "title" : "Symbol",
+        "type" : "string",
+        "enum" : [ "L", "R", "C", "LFE", "Ls", "Rs", "Lss", "Rss", "Lrs", "Rrs", "Lc", "Rc", "Cs", "HI", "VIN", "M1", "M2", "Lt", "Rt", "Lst", "Rst", "S" ]
+      },
+      "Type" : {
+        "title" : "Type",
+        "type" : "string",
+        "description" : "Singular form of the resource type to be registered",
+        "enum" : [ "node" ]
+      },
+      "Type1" : {
+        "title" : "Type1",
+        "type" : "string",
+        "description" : "Singular form of the resource type to be registered",
+        "enum" : [ "device" ]
+      },
+      "TransferCharacteristic" : {
+        "title" : "TransferCharacteristic",
+        "type" : "string",
+        "enum" : [ "SDR", "HLG", "PQ" ]
+      },
+      "Type5" : {
+        "title" : "Type5",
+        "type" : "string",
+        "description" : "Singular form of the resource type to be registered",
+        "enum" : [ "flow" ]
+      },
+      "Type4" : {
+        "title" : "Type4",
+        "type" : "string",
+        "description" : "Singular form of the resource type to be registered",
+        "enum" : [ "source" ]
+      },
+      "inline_response_200" : {
+        "example" : "{\n  \"version\": \"1441973902:879053935\",\n  \"hostname\": \"host1\",\n  \"label\": \"host1\",\n  \"description\": \"host1\",\n  \"tags\": {},\n  \"href\": \"http://172.29.80.65:12345/\",\n  \"api\": {\n    \"versions\": [\n      \"v1.0\",\n      \"v1.1\"\n    ],\n    \"endpoints\": [\n      {\n        \"host\": \"172.29.80.65\",\n        \"port\": 12345,\n        \"protocol\": \"http\"\n      },\n      {\n        \"host\": \"172.29.80.65\",\n        \"port\": 443,\n        \"protocol\": \"https\"\n      }\n    ]\n  },\n  \"services\": [\n    {\n      \"href\": \"http://172.29.80.65:12345/x-manufacturer/pipelinemanager/\",\n      \"type\": \"urn:x-manufacturer:service:pipelinemanager\"\n    },\n    {\n      \"href\": \"http://172.29.80.65:12345/x-manufacturer/status/\",\n      \"type\": \"urn:x-manufacturer:service:status\"\n    },\n    {\n      \"href\": \"http://172.29.80.65:12345/x-manufacturer/tally/\",\n      \"type\": \"urn:x-manufacturer:service:tally\"\n    },\n    {\n      \"href\": \"http://172.29.80.65:12345/x-manufacturer/mdnsbridge/\",\n      \"type\": \"urn:x-manufacturer:service:mdnsbridge\"\n    },\n    {\n      \"href\": \"http://172.29.80.65:12345/x-manufacturer/storequery/\",\n      \"type\": \"urn:x-manufacturer:service:storequery\"\n    }\n  ],\n  \"caps\": {},\n  \"id\": \"3b8be755-08ff-452b-b217-c9151eb21193\",\n  \"clocks\": [\n    {\n      \"name\": \"clk0\",\n      \"ref_type\": \"internal\"\n    },\n    {\n      \"name\": \"clk1\",\n      \"ref_type\": \"ptp\",\n      \"traceable\": true,\n      \"version\": \"IEEE1588-2008\",\n      \"gmid\": \"08-00-11-ff-fe-21-e1-b0\",\n      \"locked\": true\n    }\n  ]\n}\n",
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/Noderesource"
+        }, {
+          "$ref" : "#/components/schemas/Deviceresource"
+        }, {
+          "oneOf" : [ {
+            "$ref" : "#/components/schemas/GenericSourceresource"
+          }, {
+            "$ref" : "#/components/schemas/AudioSourceresource"
+          }, {
+            "$ref" : "#/components/schemas/DataSourceresource"
+          } ]
+        }, {
+          "anyOf" : [ {
+            "$ref" : "#/components/schemas/RawVideoFlowresource"
+          }, {
+            "$ref" : "#/components/schemas/CodedVideoFlowresource"
+          }, {
+            "$ref" : "#/components/schemas/RawAudioFlowresource"
+          }, {
+            "$ref" : "#/components/schemas/CodedAudioFlowresource"
+          }, {
+            "$ref" : "#/components/schemas/GenericdataFlowresource"
+          }, {
+            "$ref" : "#/components/schemas/SDIancillaryFlowresource"
+          }, {
+            "$ref" : "#/components/schemas/JSONbasedFlowresource"
+          }, {
+            "$ref" : "#/components/schemas/MuxFlowresource"
+          } ]
+        }, {
+          "$ref" : "#/components/schemas/Senderresource"
+        }, {
+          "oneOf" : [ {
+            "$ref" : "#/components/schemas/VideoReceiverresource"
+          }, {
+            "$ref" : "#/components/schemas/AudioReceiverresource"
+          }, {
+            "$ref" : "#/components/schemas/DataReceiverresource"
+          }, {
+            "$ref" : "#/components/schemas/MuxReceiverresource"
+          } ]
+        } ]
+      }
+    }
+  }
+}
